@@ -1,13 +1,12 @@
 import csv
 import os
-from dotenv import load_dotenv
 import re
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from typing import Final
 from datetime import datetime
 import gspread
-from google.oauth2.service_account import Credentials
+from google.oauth2 import service_account
 import logging
 
 # Configuração básica do logging
@@ -15,21 +14,20 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 logger = logging.getLogger(__name__)
-# Carregar as variáveis de ambiente do arquivo .env
-load_dotenv()
 
-TOKEN = os.getenv('TOKEN')
-BOT_USERNAME = os.getenv('BOT_USERNAME')
+TOKEN = os.environ['token']
+BOT_USERNAME = os.environ['bot_username']
 # Acessar as variáveis de ambiente
 
-private_key_id = os.getenv('PRIVATE_KEY_ID')
-private_key = os.getenv('PRIVATE_KEY')
-client_email = os.getenv('CLIENT_EMAIL')
-client_id = os.getenv('CLIENT_ID')
-auth_uri = os.getenv('AUTH_URI')
-token_uri = os.getenv('TOKEN_URI')
-auth_provider_x509_cert_url = os.getenv('AUTH_PROVIDER_X509_CERT_URL')
-client_x509_cert_url = os.getenv('CLIENT_X509_CERT_URL')
+
+private_key_id = os.environ['private_key_id']
+private_key = os.environ['private_key']
+client_email = os.environ['client_email']
+client_id = os.environ['client_id']
+auth_uri = os.environ['auth_uri']
+token_uri = os.environ['token_uri']
+auth_provider_x509_cert_url = os.environ['auth_provider_x509_cert_url']
+client_x509_cert_url = os.environ['client_x509_cert_url']
 
 # Exemplo de como usar as credenciais
 credentials = {
@@ -42,7 +40,8 @@ credentials = {
     "auth_uri": auth_uri,
     "token_uri": token_uri,
     "auth_provider_x509_cert_url": auth_provider_x509_cert_url,
-    "client_x509_cert_url": client_x509_cert_url
+    "client_x509_cert_url": client_x509_cert_url,
+    "universe_domain": "googleapis.com"
 }
 
 CHAT_PRIVADO_ID: Final[int] = 6302648701  # Substitua pelo ID real do chat privado
@@ -362,7 +361,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if extracted_data:
             logger.info("Dados extraídos com sucesso. Salvando dados...")
-            save_to_csv(extracted_data)
+            # save_to_csv(extracted_data)
             update_google_sheet(extracted_data, sheet_id, sheet_range)
             update_google_sheet(extracted_data, sheet_id_2, sheet_range)
 
