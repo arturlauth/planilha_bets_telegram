@@ -63,17 +63,15 @@ data = ['GRUPO', 'BET', 'HOME', 'AWAY', 'DATA', 'ODDS', 'DATA_ENVIO']
 sheet_range = 'A1:G1'
 
 
-# Função para autenticação no Google Sheets usando OAuth 2.0
 def authenticate_google_sheets():
     try:
-        creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+        creds = service_account.Credentials.from_service_account_info(credentials, scopes=SCOPES)
         client = gspread.authorize(creds)
         logger.info("Autenticação no Google Sheets realizada com sucesso.")
         return client
     except Exception as e:
         logger.error(f"Erro na autenticação do Google Sheets: {e}")
         return None
-
 def deduplica_google_sheet():
     sheet = client.open_by_key(sheet_id)
     worksheet = sheet.sheet1  # Seleciona a primeira aba da planilha
