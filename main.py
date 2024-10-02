@@ -1,6 +1,6 @@
 import csv
 import os
-from dotenv import dotenv_values
+from dotenv import load_dotenv
 import re
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
@@ -15,9 +15,35 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 logger = logging.getLogger(__name__)
+# Carregar as variáveis de ambiente do arquivo .env
+load_dotenv()
 
-TOKEN: Final[str] = '8035906132:AAHTtOuf-ronpCo59Zc04BapJ3cQrhJd60I'
-BOT_USERNAME: Final[str] = '@planilha_lauth_bot'
+TOKEN = os.getenv('TOKEN')
+BOT_USERNAME = os.getenv('BOT_USERNAME')
+# Acessar as variáveis de ambiente
+
+private_key_id = os.getenv('PRIVATE_KEY_ID')
+private_key = os.getenv('PRIVATE_KEY')
+client_email = os.getenv('CLIENT_EMAIL')
+client_id = os.getenv('CLIENT_ID')
+auth_uri = os.getenv('AUTH_URI')
+token_uri = os.getenv('TOKEN_URI')
+auth_provider_x509_cert_url = os.getenv('AUTH_PROVIDER_X509_CERT_URL')
+client_x509_cert_url = os.getenv('CLIENT_X509_CERT_URL')
+
+# Exemplo de como usar as credenciais
+credentials = {
+    "type": "service_account",
+    "project_id": "telegram-planilha-bot",
+    "private_key_id": private_key_id,
+    "private_key": private_key,
+    "client_email": client_email,
+    "client_id": client_id,
+    "auth_uri": auth_uri,
+    "token_uri": token_uri,
+    "auth_provider_x509_cert_url": auth_provider_x509_cert_url,
+    "client_x509_cert_url": client_x509_cert_url
+}
 
 CHAT_PRIVADO_ID: Final[int] = 6302648701  # Substitua pelo ID real do chat privado
 
@@ -30,7 +56,7 @@ sheet_id: Final[str] = "1FQFPoZO2LCuTpL1LWy5IfXzUm5qVeWhvo_OSuSbUc60"
 sheet_id_2: Final[str] = "11ielWFfC_qBeEYG15fRT8s_Btri70FJ5BxX1ffaoRQc"
 # Autenticação e acesso à planilha do Google Sheets
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-SERVICE_ACCOUNT_FILE = r"D:\Documentos\pythonprojects\telegram_bot\pythonProject\telegram-planilha-bot-6733b9165454.json"
+SERVICE_ACCOUNT_FILE = credentials
 
 # Exemplo de dados a serem inseridos
 data = ['GRUPO', 'BET', 'HOME', 'AWAY', 'DATA', 'ODDS', 'DATA_ENVIO']
