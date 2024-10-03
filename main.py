@@ -38,7 +38,7 @@ class CustomHandler(http.server.BaseHTTPRequestHandler):
             print(f"POST recebido: {post_data}")
 
             # Decodifique o JSON recebido
-            update = Update.de_json(eval(post_data.decode('utf-8')), context.bot)
+            update = Update.de_json(eval(post_data.decode('utf-8')), app.bot)
 
             # Enviar para o bot processar o update
             asyncio.run(app.process_update(update))
