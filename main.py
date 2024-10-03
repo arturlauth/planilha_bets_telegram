@@ -301,7 +301,7 @@ def process_message(text: str, message_date: datetime) -> dict:
             bet = lines[1].split('-', 1)[-1].strip()  # Texto após o primeiro "-" na linha 2
             if "under" in bet:
                 mercado = "under"
-            else
+            else:
                 mercado = "ml"
             match = lines[3].split('-', 1)[-1].strip()
             if "home" in match:
