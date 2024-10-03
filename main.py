@@ -134,7 +134,7 @@ def authenticate_google_sheets():
     except Exception as e:
         logger.error(f"Erro na autenticação do Google Sheets: {e}")
         return None
-def deduplica_google_sheet():
+def deduplica_google_sheet(client):
     sheet = client.open_by_key(sheet_id)
     worksheet = sheet.sheet1  # Seleciona a primeira aba da planilha
     # Passo 1: Obter todas as linhas da planilha
@@ -189,7 +189,7 @@ def update_google_sheet(data, sheet_id, sheet_range):
 
             # Escreve os dados na aba selecionada
             worksheet.append_row(row)  # Adiciona os dados como uma nova linha
-            deduplica_google_sheet()
+            deduplica_google_sheet(client)
             print('Dados atualizados na planilha do Google Sheets com sucesso.')
         else:
             print('Erro: Autenticação falhou.')
