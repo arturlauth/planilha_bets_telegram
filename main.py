@@ -32,15 +32,16 @@ class CustomHandler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(b'Bot is running')
 
     def do_POST(self):
-        # Verificar se o webhook foi chamado na rota correta
         if self.path == "/webhook":
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             print(f"POST recebido: {post_data}")
 
-            # Passar o payload para o bot do Telegram processar
+            # Decodifique o JSON recebido
             update = Update.de_json(eval(post_data.decode('utf-8')), context.bot)
-            asyncio.run(handle_message(update, context))
+
+            # Enviar para o bot processar o update
+            asyncio.run(app.process_update(update))
 
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
@@ -495,7 +496,9 @@ async def custom_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.error(f"Update {update} causou um erro: {context.error}")
 
+# Ajuste no `start_bot` para tornar `app` globalmente acessível:
 async def start_bot():
+    global app
     app = ApplicationBuilder().token(TOKEN).build()
 
     # Adicionar handlers
@@ -506,13 +509,12 @@ async def start_bot():
     webhook_url = "https://worldwide-chiarra-lth-projetos-1db55d3b.koyeb.app/webhook"
     await app.bot.set_webhook(webhook_url)
 
-    # Iniciar o bot com webhook
     await app.initialize()
-    await app.start()  # Inicia o bot
+    await app.start()
     print("Webhook configurado e bot rodando!")
 
     # Manter o bot ativo usando asyncio
-    await asyncio.Event().wait()  # Substitui o app.idle()
+    await asyncio.Event().wait()
 
 def main():
     # Usar asyncio.run para executar a função assíncrona
