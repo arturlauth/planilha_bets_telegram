@@ -402,6 +402,9 @@ def save_to_csv(data: dict, filename=FILE_PATH):
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         # Verifica se a mensagem é de grupo ou de canal
+        print("handle_message foi chamado")  # Verificação se a função é chamada
+        logger.info("handle_message foi chamado")
+        print(f"Payload recebido: {update.to_dict()}")
         if update.channel_post:
             message_type = 'channel'
             message_date = update.channel_post.date
@@ -485,7 +488,7 @@ async def start_bot():
 
     # Adicionar handlers
     app.add_handler(CommandHandler('start', start_command))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app.add_handler(MessageHandler(filters.TEXT, handle_message))
 
     # Configurar Webhook
     webhook_url = "https://worldwide-chiarra-lth-projetos-1db55d3b.koyeb.app/"
