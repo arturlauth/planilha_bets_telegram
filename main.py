@@ -17,16 +17,16 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 #env para koeyb
-TOKEN = {{ token }}
-BOT_USERNAME = {{ bot_username }}
-private_key_id = {{ private_key_id }}
-private_key = {{ private_key }}
-client_email = {{ client_email }}
-client_id = {{ client_id }}
-auth_uri = {{ auth_uri }}
-token_uri = {{ token_uri }}
-auth_provider_x509_cert_url = {{ auth_provider_x509_cert_url }}
-client_x509_cert_url = {{ client_x509_cert_url }}
+TOKEN = os.environ.get("token")
+BOT_USERNAME = os.environ.get("bot_username")
+private_key_id = os.environ.get("private_key_id")
+private_key = os.environ.get("private_key")
+client_email = os.environ.get("client_email")
+client_id = os.environ.get("client_id")
+auth_uri = os.environ.get("auth_uri")
+token_uri = os.environ.get("token_uri")
+auth_provider_x509_cert_url = os.environ.get("auth_provider_x509_cert_url")
+client_x509_cert_url = os.environ.get("client_x509_cert_url")
 
 # TOKEN = os.environ['token']
 # BOT_USERNAME = os.environ['bot_username']
