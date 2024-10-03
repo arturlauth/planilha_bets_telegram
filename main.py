@@ -530,7 +530,7 @@ if __name__ == '__main__':
         "type": "service_account",
         "project_id": "telegram-planilha-bot",
         "private_key_id": os.environ.get("private_key_id"),
-        "private_key": os.environ.get("private_key").replace("\\n", "\n"),
+        "private_key": os.environ.get("private_key"),
         "client_email": os.environ.get("client_email"),
         "client_id": os.environ.get("client_id"),
         "auth_uri": os.environ.get("auth_uri"),
