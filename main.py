@@ -13,7 +13,44 @@ import http.server
 import socketserver
 import threading
 
+# Classe para lidar com as requisições HTTP
+class CustomHandler(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        # Responde ao health check
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        self.wfile.write(b'Bot is running')
+
+    def do_POST(self):
+        if self.path == "/webhook":
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            print(f"POST recebido: {post_data}")
+
+            # Decodifique o JSON recebido
+            update = Update.de_json(eval(post_data.decode('utf-8')), app.bot)
+
+            # Enviar para o bot processar o update
+            asyncio.run(app.process_update(update))
+
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(b'{"status":"received"}')
+        else:
+            self.send_response(404)
+            self.end_headers()
+
+
+# Função para rodar o servidor HTTP
+def run_health_check_server():
+    with socketserver.TCPServer(("", PORT), CustomHandler) as httpd:
+        print(f"Servidor de health check e webhook rodando na porta {PORT}")
+        httpd.serve_forever()
+        
 # Configuração básica do logging
+
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
@@ -85,40 +122,8 @@ sheet_range = 'A1:G1'
 
 
 
-# Classe para lidar com as requisições HTTP
-class CustomHandler(http.server.BaseHTTPRequestHandler):
-    def do_GET(self):
-        # Responde ao health check
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
-        self.wfile.write(b'Bot is running')
 
-    def do_POST(self):
-        if self.path == "/webhook":
-            content_length = int(self.headers['Content-Length'])
-            post_data = self.rfile.read(content_length)
-            print(f"POST recebido: {post_data}")
 
-            # Decodifique o JSON recebido
-            update = Update.de_json(eval(post_data.decode('utf-8')), app.bot)
-
-            # Enviar para o bot processar o update
-            asyncio.run(app.process_update(update))
-
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            self.wfile.write(b'{"status":"received"}')
-        else:
-            self.send_response(404)
-            self.end_headers()
-
-# Função para rodar o servidor HTTP
-def run_health_check_server():
-    with socketserver.TCPServer(("", PORT), CustomHandler) as httpd:
-        print(f"Servidor de health check e webhook rodando na porta {PORT}")
-        httpd.serve_forever()
 
 def authenticate_google_sheets():
     try:
