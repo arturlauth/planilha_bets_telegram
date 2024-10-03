@@ -522,4 +522,25 @@ def main():
     asyncio.run(start_bot())
 
 if __name__ == '__main__':
-    main()
+    import gspread
+    from google.oauth2 import service_account
+
+    SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+    credentials = {
+        "type": "service_account",
+        "project_id": "telegram-planilha-bot",
+        "private_key_id": os.environ.get("private_key_id"),
+        "private_key": os.environ.get("private_key").replace("\\n", "\n"),
+        "client_email": os.environ.get("client_email"),
+        "client_id": os.environ.get("client_id"),
+        "auth_uri": os.environ.get("auth_uri"),
+        "token_uri": os.environ.get("token_uri"),
+        "auth_provider_x509_cert_url": os.environ.get("auth_provider_x509_cert_url"),
+        "client_x509_cert_url": os.environ.get("client_x509_cert_url")
+    }
+
+    creds = service_account.Credentials.from_service_account_info(credentials, scopes=SCOPES)
+    client = gspread.authorize(creds)
+    sheet = client.open_by_key("1FQFPoZO2LCuTpL1LWy5IfXzUm5qVeWhvo_OSuSbUc60")
+
+    print(sheet.sheet1.get_all_values())
