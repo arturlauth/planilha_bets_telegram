@@ -253,7 +253,7 @@ def process_message(text: str, message_date: datetime) -> dict:
                 'DATA_ENVIO': data_envio
             }
         # padrao 1 under:
-        elif 'under' in lines[0].lower():
+        elif "under" in lines[0]:
         
             grupo = 'under'
             # Encontrar a aposta (ex: Under 2.5)
