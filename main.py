@@ -446,15 +446,16 @@ async def start_bot():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     # Configurar Webhook
-    webhook_url = "https://your-webhook-url.com/webhook"
+    webhook_url = "https://worldwide-chiarra-lth-projetos-1db55d3b.koyeb.app/"
     await app.bot.set_webhook(webhook_url)
 
     # Iniciar o bot com webhook
+    await app.initialize()
     await app.start()  # Inicia o bot
     print("Webhook configurado e bot rodando!")
 
-    # Manter o bot ativo
-    await app.idle()  # use idle() para manter o bot ativo
+    # Manter o bot ativo usando asyncio
+    await asyncio.Event().wait()  # Substitui o app.idle()
 
 def main():
     # Usar asyncio.run para executar a função assíncrona
