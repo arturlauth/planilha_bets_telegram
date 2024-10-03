@@ -22,40 +22,6 @@ logger = logging.getLogger(__name__)
 # Configuração do health check no Koyeb
 PORT = 8000
 
-# Classe para lidar com as requisições HTTP
-class CustomHandler(http.server.BaseHTTPRequestHandler):
-    def do_GET(self):
-        # Responde ao health check
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
-        self.wfile.write(b'Bot is running')
-
-    def do_POST(self):
-        if self.path == "/webhook":
-            content_length = int(self.headers['Content-Length'])
-            post_data = self.rfile.read(content_length)
-            print(f"POST recebido: {post_data}")
-
-            # Decodifique o JSON recebido
-            update = Update.de_json(eval(post_data.decode('utf-8')), app.bot)
-
-            # Enviar para o bot processar o update
-            asyncio.run(app.process_update(update))
-
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            self.wfile.write(b'{"status":"received"}')
-        else:
-            self.send_response(404)
-            self.end_headers()
-
-# Função para rodar o servidor HTTP
-def run_health_check_server():
-    with socketserver.TCPServer(("", PORT), CustomHandler) as httpd:
-        print(f"Servidor de health check e webhook rodando na porta {PORT}")
-        httpd.serve_forever()
 # Iniciar o servidor de health check
 threading.Thread(target=run_health_check_server, daemon=True).start()
 
@@ -100,7 +66,6 @@ credentials = {
     "universe_domain": "googleapis.com"
 }
 # Substitua esta linha antes de usar as credenciais
-credentials["private_key"] = credentials["private_key"].replace("\\n", "\n")
 CHAT_PRIVADO_ID: Final[int] = 6302648701  # Substitua pelo ID real do chat privado
 
 # Defina o caminho completo para onde o arquivo será salvo no seu computador
@@ -118,6 +83,42 @@ SERVICE_ACCOUNT_FILE = credentials
 data = ['GRUPO', 'BET', 'HOME', 'AWAY', 'DATA', 'ODDS', 'DATA_ENVIO']
 sheet_range = 'A1:G1'
 
+
+
+# Classe para lidar com as requisições HTTP
+class CustomHandler(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        # Responde ao health check
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        self.wfile.write(b'Bot is running')
+
+    def do_POST(self):
+        if self.path == "/webhook":
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            print(f"POST recebido: {post_data}")
+
+            # Decodifique o JSON recebido
+            update = Update.de_json(eval(post_data.decode('utf-8')), app.bot)
+
+            # Enviar para o bot processar o update
+            asyncio.run(app.process_update(update))
+
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(b'{"status":"received"}')
+        else:
+            self.send_response(404)
+            self.end_headers()
+
+# Função para rodar o servidor HTTP
+def run_health_check_server():
+    with socketserver.TCPServer(("", PORT), CustomHandler) as httpd:
+        print(f"Servidor de health check e webhook rodando na porta {PORT}")
+        httpd.serve_forever()
 
 def authenticate_google_sheets():
     try:
@@ -522,25 +523,4 @@ def main():
     asyncio.run(start_bot())
 
 if __name__ == '__main__':
-    import gspread
-    from google.oauth2 import service_account
-
-    SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-    credentials = {
-        "type": "service_account",
-        "project_id": "telegram-planilha-bot",
-        "private_key_id": os.environ.get("private_key_id"),
-        "private_key": os.environ.get("private_key"),
-        "client_email": os.environ.get("client_email"),
-        "client_id": os.environ.get("client_id"),
-        "auth_uri": os.environ.get("auth_uri"),
-        "token_uri": os.environ.get("token_uri"),
-        "auth_provider_x509_cert_url": os.environ.get("auth_provider_x509_cert_url"),
-        "client_x509_cert_url": os.environ.get("client_x509_cert_url")
-    }
-
-    creds = service_account.Credentials.from_service_account_info(credentials, scopes=SCOPES)
-    client = gspread.authorize(creds)
-    sheet = client.open_by_key("1FQFPoZO2LCuTpL1LWy5IfXzUm5qVeWhvo_OSuSbUc60")
-
-    print(sheet.sheet1.get_all_values())
+    main()
