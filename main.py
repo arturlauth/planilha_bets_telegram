@@ -246,9 +246,9 @@ def process_message(text: str, message_date: datetime) -> dict:
                 'DATA_ENVIO': data_envio
             }
         # padrao 1 under:
-        elif 'Under' in linhas[0]:
+        elif 'Under' in lines[0]:
             grupo = 'under'
-            bet_match = re.search(r'Under \d+\.\d+', linhas[0])
+            bet_match = re.search(r'Under \d+\.\d+', lines[0])
             bet = bet_match.group(0) if bet_match else ''
         
             mercado = 'under'
@@ -422,7 +422,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message_type = 'channel'
             message_date = update.channel_post.date
             text = update.channel_post.text
-            print(f"Mensagem recebida em canal: {text}")
+            # print(f"Mensagem recebida em canal: {text}")
 
             logger.info(f"Mensagem recebida de {update.channel_post.chat.id} em {message_type}: {text}")
 
@@ -430,7 +430,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message_type = update.message.chat.type
             text = update.message.text
             message_date = update.message.date
-            print(f"Mensagem recebida no grupo ou chat: {text}")
+            # print(f"Mensagem recebida no grupo ou chat: {text}")
 
             logger.info(f"Mensagem recebida de {update.message.chat.id} em {message_type}: {text}")
 
