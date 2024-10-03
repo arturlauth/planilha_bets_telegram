@@ -32,13 +32,16 @@ class CustomHandler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(b'Bot is running')
 
     def do_POST(self):
+        # Verificar se o webhook foi chamado na rota correta
         if self.path == "/webhook":
-            # Verifique o conteúdo do POST recebido
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             print(f"POST recebido: {post_data}")
 
-            # Insira aqui o processamento do webhook
+            # Passar o payload para o bot do Telegram processar
+            update = Update.de_json(eval(post_data.decode('utf-8')), context.bot)
+            asyncio.run(handle_message(update, context))
+
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
