@@ -273,15 +273,18 @@ def process_message(text: str, message_date: datetime) -> dict:
             odds_match = re.search(r'bet365 odds - (\d+(\.\d+)?)', text)
             odds = odds_match.group(1) if odds_match else 'N/A'
     
-            # Extração da data e formatação
-            date_match = re.search(r'kick off - (.+)', text)
+            # Extração da data e formatação, removendo as informações adicionais no final
+            date_match = re.search(r'kick off - (.+)', text, re.IGNORECASE)
             if date_match:
-                date_str = date_match.group(1).strip()
-                data_obj = datetime.strptime(date_str.split(' GMT')[0], "%a %b %d %Y %H:%M:%S")
-                data_formatada = data_obj.strftime("%d/%m/%Y")
+                date_str = date_match.group(1).split(' GMT')[0].strip()  # Remover informações adicionais
+                try:
+                    data_obj = datetime.strptime(date_str, "%a %b %d %Y %H:%M:%S")
+                    data_formatada = data_obj.strftime("%d/%m/%Y")
+                except ValueError as ve:
+                    logger.error(f"Erro ao converter a data: {ve}. Data original: {date_str}")
+                    data_formatada = 'N/A'
             else:
                 data_formatada = 'N/A'
-    
             # Definir a data de envio da mensagem
             data_envio = format_message_date(message_date)
     
