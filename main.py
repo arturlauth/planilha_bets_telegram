@@ -189,7 +189,7 @@ def update_google_sheet(data, sheet_id, sheet_range):
 
             # Escreve os dados na aba selecionada
             worksheet.append_row(row)  # Adiciona os dados como uma nova linha
-
+            deduplica_google_sheet()
             print('Dados atualizados na planilha do Google Sheets com sucesso.')
         else:
             print('Erro: Autenticação falhou.')
