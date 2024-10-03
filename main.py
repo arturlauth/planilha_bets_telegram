@@ -16,19 +16,31 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-TOKEN = os.environ['token']
-BOT_USERNAME = os.environ['bot_username']
-# Acessar as variáveis de ambiente
+#env para koeyb
+TOKEN = {{ token }}
+BOT_USERNAME = {{ bot_username }}
+private_key_id = {{ private_key_id }}
+private_key = {{ private_key }}
+client_email = {{ client_email }}
+client_id = {{ client_id }}
+auth_uri = {{ auth_uri }}
+token_uri = {{ token_uri }}
+auth_provider_x509_cert_url = {{ auth_provider_x509_cert_url }}
+client_x509_cert_url = {{ client_x509_cert_url }}
+
+# TOKEN = os.environ['token']
+# BOT_USERNAME = os.environ['bot_username']
+# # Acessar as variáveis de ambiente
 
 
-private_key_id = os.environ['private_key_id']
-private_key = os.environ['private_key']
-client_email = os.environ['client_email']
-client_id = os.environ['client_id']
-auth_uri = os.environ['auth_uri']
-token_uri = os.environ['token_uri']
-auth_provider_x509_cert_url = os.environ['auth_provider_x509_cert_url']
-client_x509_cert_url = os.environ['client_x509_cert_url']
+# private_key_id = os.environ['private_key_id']
+# private_key = os.environ['private_key']
+# client_email = os.environ['client_email']
+# client_id = os.environ['client_id']
+# auth_uri = os.environ['auth_uri']
+# token_uri = os.environ['token_uri']
+# auth_provider_x509_cert_url = os.environ['auth_provider_x509_cert_url']
+# client_x509_cert_url = os.environ['client_x509_cert_url']
 
 # Exemplo de como usar as credenciais
 credentials = {
