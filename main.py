@@ -202,8 +202,32 @@ def process_message(text: str, message_date: datetime) -> dict:
                 'ODDS': odds,
                 'DATA_ENVIO': data_envio
             }
+        # padrao 1 under:
+        elif 'Under' in linhas[0]:
+            grupo = 'under'
+            bet_match = re.search(r'Under \d+\.\d+', linhas[0])
+            bet = bet_match.group(0) if bet_match else ''
+        
+            mercado = 'under'
 
-        # Padrão 2: "king" (outro formato)
+            # Extração de Home e Away
+            home = re.search(r'Home Name - (.+)', mensagem).group(1)
+            away = re.search(r'Away Name - (.+)', mensagem).group(1)
+
+            # Extração de data e formatação
+            data_kickoff = re.search(r'Kick off - (.+)', mensagem).group(1)
+            data_obj = datetime.strptime(data_kickoff, "%a %b %d %Y %H:%M:%S GMT%z")
+            data_formatada = data_obj.strftime("%d/%m/%Y")
+
+            return {
+                'grupo': grupo,
+                'bet': bet,
+                'mercado': mercado,
+                'home': home,
+                'away': away,
+                'data': data_formatada,
+            }
+        # Padrão 2: "under" (outro formato)
         elif "king" in lines[0]:
             grupo = lines[0]
             bet = lines[1].split('-', 1)[-1].strip()  # Texto após o primeiro "-" na linha 2
@@ -415,7 +439,7 @@ async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.error(f"Update {update} causou um erro: {context.error}")
 
 async def start_bot():
-    app = Application.builder().token(os.getenv("TOKEN")).build()
+    app = Application.builder().token(TOKEN).build()
 
     # Adicionar handlers aqui
     app.add_handler(CommandHandler('start', start_command))
