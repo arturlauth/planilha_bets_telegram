@@ -99,7 +99,8 @@ credentials = {
     "client_x509_cert_url": client_x509_cert_url,
     "universe_domain": "googleapis.com"
 }
-
+# Substitua esta linha antes de usar as credenciais
+credentials["private_key"] = credentials["private_key"].replace("\\n", "\n")
 CHAT_PRIVADO_ID: Final[int] = 6302648701  # Substitua pelo ID real do chat privado
 
 # Defina o caminho completo para onde o arquivo será salvo no seu computador
