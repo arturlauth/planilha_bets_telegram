@@ -9,12 +9,27 @@ import gspread
 from google.oauth2 import service_account
 import logging
 import asyncio
+import http.server
+import socketserver
+import threading
 
 # Configuração básica do logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 logger = logging.getLogger(__name__)
+
+# Configuração do health check no Koyeb
+PORT = 8000
+
+def run_health_check_server():
+    handler = http.server.SimpleHTTPRequestHandler
+    with socketserver.TCPServer(("", PORT), handler) as httpd:
+        print(f"Servidor de health check rodando na porta {PORT}")
+        httpd.serve_forever()
+
+# Iniciar o servidor de health check
+threading.Thread(target=run_health_check_server, daemon=True).start()
 
 #env para koeyb
 TOKEN = os.environ.get("token")
@@ -376,6 +391,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message_type = 'channel'
             message_date = update.channel_post.date
             text = update.channel_post.text
+            print(f"Mensagem recebida em canal: {text}")
 
             logger.info(f"Mensagem recebida de {update.channel_post.chat.id} em {message_type}: {text}")
 
@@ -383,22 +399,28 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message_type = update.message.chat.type
             text = update.message.text
             message_date = update.message.date
+            print(f"Mensagem recebida no grupo ou chat: {text}")
 
             logger.info(f"Mensagem recebida de {update.message.chat.id} em {message_type}: {text}")
 
         else:
             logger.warning("Mensagem recebida não é de grupo nem de canal.")
+            print("Mensagem recebida não é de grupo nem de canal.")
             return  # Se não for nem mensagem de grupo nem de canal, sai da função
 
         # Processa a mensagem
         logger.info("Iniciando o processamento da mensagem.")
+        print("Processando mensagem...")
         extracted_data = process_message(text, message_date)
 
         logger.info(f"Dados extraídos: {extracted_data}")
+        print(f"Dados extraídos: {extracted_data}")
 
         if extracted_data:
             logger.info("Dados extraídos com sucesso. Salvando dados...")
-            # save_to_csv(extracted_data)
+            print("Dados extraídos com sucesso. Salvando dados...")
+
+            # Salvar no Google Sheets
             update_google_sheet(extracted_data, sheet_id, sheet_range)
             update_google_sheet(extracted_data, sheet_id_2, sheet_range)
 
@@ -408,17 +430,22 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 text=f'Dados salvos com sucesso:\n{extracted_data}'
             )
             logger.info("Confirmação enviada para o chat privado.")
+            print("Confirmação enviada para o chat privado.")
         else:
             logger.error("Formato de mensagem inválido. Nenhum dado foi extraído.")
+            print("Formato de mensagem inválido. Nenhum dado foi extraído.")
+
             # Enviar mensagem de erro no chat privado
             await context.bot.send_message(
                 chat_id=CHAT_PRIVADO_ID,
                 text='Formato de mensagem inválido.'
             )
             logger.info("Mensagem de erro enviada para o chat privado.")
+            print("Mensagem de erro enviada para o chat privado.")
 
     except Exception as e:
         logger.exception("Erro ao processar a mensagem: %s", str(e))
+        print(f"Erro ao processar a mensagem: {str(e)}")
 
 async def get_chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.message.chat.id
