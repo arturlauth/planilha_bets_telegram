@@ -32,11 +32,20 @@ class CustomHandler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(b'Bot is running')
 
     def do_POST(self):
-        # Responde ao webhook do Telegram
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
-        self.wfile.write(b'{"status":"received"}')
+        if self.path == "/webhook":
+            # Verifique o conteúdo do POST recebido
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            print(f"POST recebido: {post_data}")
+
+            # Insira aqui o processamento do webhook
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(b'{"status":"received"}')
+        else:
+            self.send_response(404)
+            self.end_headers()
 
 # Função para rodar o servidor HTTP
 def run_health_check_server():
@@ -491,7 +500,7 @@ async def start_bot():
     app.add_handler(MessageHandler(filters.TEXT, handle_message))
 
     # Configurar Webhook
-    webhook_url = "https://worldwide-chiarra-lth-projetos-1db55d3b.koyeb.app/"
+    webhook_url = "https://worldwide-chiarra-lth-projetos-1db55d3b.koyeb.app/webhook"
     await app.bot.set_webhook(webhook_url)
 
     # Iniciar o bot com webhook
