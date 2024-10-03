@@ -204,7 +204,7 @@ def process_message(text: str, message_date: datetime) -> dict:
             odds = lines[6].split('-', 1)[-1].strip()
             date = format_date(lines[5].split('-', 1)[-1].strip())
             data_envio = format_message_date(message_date)
-            grupo = "king ml"
+            grupo = "under"
             return {
                 'GRUPO': grupo,
                 'BET': bet,
