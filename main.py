@@ -253,35 +253,56 @@ def process_message(text: str, message_date: datetime) -> dict:
                 'DATA_ENVIO': data_envio
             }
         # padrao 1 under:
-        elif 'Under' in lines[0]:
-            grupo = 'under'
-            bet_match = re.search(r'Under \d+\.\d+', lines[0])
-            bet = bet_match.group(0) if bet_match else ''
+        elif 'under' in lines[0].lower():
         
+            grupo = 'under'
+            # Encontrar a aposta (ex: Under 2.5)
+            bet_match = re.search(r'under \d+\.\d+', lines[0])
+            bet = bet_match.group(0) if bet_match else ''
+    
             mercado = 'under'
-
-            # Extração de Home e Away
-            home = re.search(r'Home Name - (.+)', mensagem).group(1)
-            away = re.search(r'Away Name - (.+)', mensagem).group(1)
-
-            # Extração de data e formatação
-            data_kickoff = re.search(r'Kick off - (.+)', mensagem).group(1)
-            data_obj = datetime.strptime(data_kickoff, "%a %b %d %Y %H:%M:%S GMT%z")
-            data_formatada = data_obj.strftime("%d/%m/%Y")
-
+    
+            # Extração dos times "Home" e "Away"
+            home_match = re.search(r'home name - (.+)', text)
+            home = home_match.group(1).strip() if home_match else 'N/A'
+    
+            away_match = re.search(r'away name - (.+)', text)
+            away = away_match.group(1).strip() if away_match else 'N/A'
+    
+            # Extração de odds
+            odds_match = re.search(r'bet365 odds - (\d+(\.\d+)?)', text)
+            odds = odds_match.group(1) if odds_match else 'N/A'
+    
+            # Extração da data e formatação
+            date_match = re.search(r'kick off - (.+)', text)
+            if date_match:
+                date_str = date_match.group(1).strip()
+                data_obj = datetime.strptime(date_str.split(' GMT')[0], "%a %b %d %Y %H:%M:%S")
+                data_formatada = data_obj.strftime("%d/%m/%Y")
+            else:
+                data_formatada = 'N/A'
+    
+            # Definir a data de envio da mensagem
+            data_envio = format_message_date(message_date)
+    
             return {
-                'grupo': grupo,
-                'bet': bet,
-                'mercado': mercado,
-                'home': home,
-                'away': away,
-                'data': data_formatada,
+                'GRUPO': grupo,
+                'BET': bet,
+                'MERCADO': mercado,
+                'HOME': home,
+                'AWAY': away,
+                'DATA': data_formatada,
+                'ODDS': odds,
+                'DATA_ENVIO': data_envio
             }
         # Padrão 2: "under" (outro formato)
         elif "king" in lines[0]:
             grupo = lines[0]
             bet = lines[1].split('-', 1)[-1].strip()  # Texto após o primeiro "-" na linha 2
-            mercado = "ml"
+            if "under" in bet:
+                mercado = "under"
+            else
+                mercado = "ml"
             match = lines[3].split('-', 1)[-1].strip()
             if "home" in match:
                 match = "home"
