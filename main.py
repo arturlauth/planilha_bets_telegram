@@ -22,12 +22,27 @@ logger = logging.getLogger(__name__)
 # Configuração do health check no Koyeb
 PORT = 8000
 
-def run_health_check_server():
-    handler = http.server.SimpleHTTPRequestHandler
-    with socketserver.TCPServer(("", PORT), handler) as httpd:
-        print(f"Servidor de health check rodando na porta {PORT}")
-        httpd.serve_forever()
+# Classe para lidar com as requisições HTTP
+class CustomHandler(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        # Responde ao health check
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        self.wfile.write(b'Bot is running')
 
+    def do_POST(self):
+        # Responde ao webhook do Telegram
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        self.wfile.write(b'{"status":"received"}')
+
+# Função para rodar o servidor HTTP
+def run_health_check_server():
+    with socketserver.TCPServer(("", PORT), CustomHandler) as httpd:
+        print(f"Servidor de health check e webhook rodando na porta {PORT}")
+        httpd.serve_forever()
 # Iniciar o servidor de health check
 threading.Thread(target=run_health_check_server, daemon=True).start()
 
