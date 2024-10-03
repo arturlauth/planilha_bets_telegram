@@ -1,1 +1,1 @@
-worker: python main.py
+web: python nome_do_seu_arquivo.py

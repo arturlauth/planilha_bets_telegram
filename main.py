@@ -401,20 +401,31 @@ async def custom_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.error(f"Update {update} causou um erro: {context.error}")
 
+async def start_bot():
+    app = Application.builder().token(os.getenv("TOKEN")).build()
 
-def main():
-    logger.info('Iniciando o bot...')
-    app = Application.builder().token(TOKEN).build()
-
+    # Adicionar handlers aqui
     app.add_handler(CommandHandler('start', start_command))
     app.add_handler(CommandHandler('custom_command', custom_command))
-    # app.add_handler(CommandHandler('get_chat_id', get_chat_id))
     app.add_handler(MessageHandler(filters.TEXT, handle_message))
     app.add_error_handler(error)
 
-    logger.info('Bot em execução...')
-    app.run_polling(poll_interval=5)
+    # Configurar Webhook
+    webhook_url = "https://worldwide-chiarra-lth-projetos-1db55d3b.koyeb.app/webhook"  # Substitua pelo domínio correto
+    await app.bot.set_webhook(webhook_url)
 
+    # Iniciar o bot com webhook
+    await app.start()
+    await app.updater.start_webhook(listen="0.0.0.0", port=int(os.getenv("PORT", 8000)), url_path="/webhook", webhook_url=webhook_url)
+
+    print("Webhook configurado e bot rodando!")
+
+    # Manter o bot ativo
+    await app.updater.idle()
+
+def main():
+    # Usar asyncio.run para executar a função assíncrona
+    asyncio.run(start_bot())
 
 if __name__ == '__main__':
     main()
